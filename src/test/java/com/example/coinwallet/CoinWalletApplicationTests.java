@@ -8,6 +8,7 @@ class CoinWalletApplicationTests {
 
     @Test
     void contextLoads() {
+        throw new UnsupportedOperationException("Этот метод еще не реализован.");
     }
 
 }
