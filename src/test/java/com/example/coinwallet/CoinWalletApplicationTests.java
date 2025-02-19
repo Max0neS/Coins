@@ -8,7 +8,8 @@ class CoinWalletApplicationTests {
 
     @Test
     void contextLoads() {
-        throw new UnsupportedOperationException("Этот метод еще не реализован.");
+        // Здесь можно добавить логику для проверки загрузки контекста
+        // Например, assertNotNull(applicationContext);
     }
 
 }
