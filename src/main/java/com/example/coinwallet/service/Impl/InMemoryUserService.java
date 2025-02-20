@@ -25,6 +25,15 @@ public class InMemoryUserService implements UserService{
     }
 
     @Override
+    public User searchUser(String name){
+        if (name != null) {
+            return repository.findByName(name);
+        } else {
+            return null; // Возвращаем всех пользователей, если параметры не указаны
+        }
+    }
+
+    @Override
     public User findByName(String name){
         return repository.findByName(name);
     }

@@ -3,9 +3,6 @@ package com.example.coinwallet.controller;
 import com.example.coinwallet.model.User;
 import com.example.coinwallet.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +16,6 @@ public class UserController {
 
     @GetMapping
     public List<User> findAllUser(){
-        //todo
         return service.findAllUser();
     }
 
@@ -27,6 +23,11 @@ public class UserController {
     public String saveUser(@RequestBody User user){
         service.saveUser(user);
         return "successfully save";
+    }
+
+    @GetMapping("/search")
+    public User searchUser(@RequestParam(required = false) String name){
+        return service.searchUser(name);
     }
 
     @GetMapping("/{name}")
