@@ -1,4 +1,4 @@
-package com.example.coinwallet.service.Impl;
+package com.example.coinwallet.service.impl;
 
 import com.example.coinwallet.model.User;
 import com.example.coinwallet.repository.InMemoryUserDAO;
@@ -10,12 +10,12 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class InMemoryUserService implements UserService{
+public class InMemoryUserService implements UserService {
 
     private final InMemoryUserDAO repository;
 
     @Override
-    public List<User> findAllUser(){
+    public List<User> findAllUser() {
         return repository.findAllUser();
     }
 
@@ -25,7 +25,7 @@ public class InMemoryUserService implements UserService{
     }
 
     @Override
-    public User searchUser(String name){
+    public User searchUser(String name) {
         if (name != null) {
             return repository.findByName(name);
         } else {
@@ -34,17 +34,17 @@ public class InMemoryUserService implements UserService{
     }
 
     @Override
-    public User findByName(String name){
+    public User findByName(String name) {
         return repository.findByName(name);
     }
 
     @Override
-    public User updateUser(User user){
+    public User updateUser(User user) {
         return repository.updateUser(user);
     }
 
     @Override
-    public void deleteUser(String name){
+    public void deleteUser(String name) {
         repository.deleteUser(name);
     }
 }
