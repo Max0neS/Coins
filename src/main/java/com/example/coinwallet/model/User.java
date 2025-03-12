@@ -12,6 +12,11 @@ import lombok.Data;
 public class User {
 
     /**
+     * Имя пользователя.
+     */
+    private Integer id;
+
+    /**
        * Имя пользователя.
        */
     private String name;

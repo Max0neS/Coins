@@ -13,7 +13,11 @@ public interface UserService {
 
     User findByName(String name);
 
+    List<User> findAllByName(final String name);
+
+    User findById(Integer id);
+
     User updateUser(User user);
 
-    void deleteUser(String name);
+    void deleteUser(Integer id);
 }

@@ -4,6 +4,8 @@ import com.example.coinwallet.model.User;
 import com.example.coinwallet.service.UserService;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,15 +44,20 @@ public class UserController {
         }
 
         /**
-         * Сохраняет нового пользователя.
+         * Сохраняет нового пользователя, с проверкой по id.
          *
-         * @param user объект пользователя, который нужно сохранить
+         * @param newUser объект пользователя, который нужно сохранить
          * @return сообщение о результате операции
          */
+
         @PostMapping("save_student")
-        public String saveUser(@RequestBody final User user) {
-            service.saveUser(user);
-            return "successfully save";
+        public ResponseEntity<?> createUser(@RequestBody final User newUser) {
+            try {
+               service.saveUser(newUser);
+               return ResponseEntity.status(HttpStatus.OK).body("successfully save");
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            }
         }
 
         /**
@@ -60,19 +67,19 @@ public class UserController {
          * @return найденный пользователь или null, если не найден
          */
         @GetMapping("/search")
-        public User searchUser(@RequestParam(required = false) final String name) {
-            return service.searchUser(name);
+        public List<User> searchUser(@RequestParam(required = false) final String name) {
+            return service.findAllByName(name);
         }
 
         /**
-         * Находит пользователя по имени.
+         * Находит пользователя по id.
          *
-         * @param name имя пользователя
+         * @param id id пользователя
          * @return найденный пользователь
          */
-        @GetMapping("/{name}")
-        public User findByName(@PathVariable final String name) {
-            return service.findByName(name);
+        @GetMapping("/{id}")
+        public User findById(@PathVariable final Integer id) {
+            return service.findById(id);
         }
 
         /**
@@ -87,13 +94,13 @@ public class UserController {
         }
 
         /**
-         * Удаляет пользователя по имени.
+         * Удаляет пользователя по id.
          *
-         * @param name имя пользователя, которого нужно удалить
+         * @param id id пользователя, которого нужно удалить
          */
-        @DeleteMapping("delete_student/{name}")
-        public void deleteUser(@PathVariable final String name) {
-            service.deleteUser(name);
+        @DeleteMapping("delete_student/{id}")
+        public void deleteUser(@PathVariable final Integer id) {
+            service.deleteUser(id);
         }
 
 }

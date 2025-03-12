@@ -29,7 +29,7 @@ public class InMemoryUserService implements UserService {
         if (name != null) {
             return repository.findByName(name);
         } else {
-            return null; // Возвращаем всех пользователей, если параметры не указаны
+            return null;
         }
     }
 
@@ -39,12 +39,26 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
+    public List<User> findAllByName(String name) {
+        if (name != null) {
+            return repository.findAllByName(name);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public User findById(Integer id) {
+        return repository.findById(id);
+    }
+
+    @Override
     public User updateUser(User user) {
         return repository.updateUser(user);
     }
 
     @Override
-    public void deleteUser(String name) {
-        repository.deleteUser(name);
+    public void deleteUser(Integer id) {
+        repository.deleteUser(id);
     }
 }

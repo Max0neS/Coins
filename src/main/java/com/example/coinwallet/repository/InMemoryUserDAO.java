@@ -3,6 +3,7 @@ package com.example.coinwallet.repository;
 import com.example.coinwallet.model.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Repository;
 
@@ -36,8 +37,14 @@ public class InMemoryUserDAO {
        * @return Сохраненный пользователь.
        */
     public User saveUser(final User newUser) {
-      usersList.add(newUser);
-      return newUser;
+        for (User user : usersList) {
+            if (user.getId().equals(newUser.getId())) {
+                throw new IllegalArgumentException("Пользователь с ID " + newUser.getId() + " уже существует.");
+            }
+        }
+
+        usersList.add(newUser);
+        return newUser;
     }
 
     /**
@@ -46,11 +53,25 @@ public class InMemoryUserDAO {
        * @param name Имя пользователя для поиска.
        * @return Пользователь с указанным именем или null
        */
+
     public User findByName(final String name) {
-      return usersList.stream()
-                  .filter(element -> element.getName()
-                          .equals(name)).findFirst()
-                  .orElse(null);
+        return usersList.stream()
+                .filter(element -> element.getName()
+                        .equals(name)).findFirst()
+                .orElse(null);
+    }
+
+    public List<User> findAllByName(final String name) {
+        return usersList.stream()
+                .filter(element -> element.getName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    public User findById(final Integer id) {
+        return usersList.stream()
+                .filter(element -> element.getId().equals(id)) // Фильтруем по id
+                .findFirst() // Находим первый элемент, который соответствует фильтру
+                .orElse(null); // Если не найдено, возвращаем null
     }
 
     /**
@@ -63,7 +84,7 @@ public class InMemoryUserDAO {
       var userIndex = IntStream.range(0, usersList.size())
                   .filter(index -> usersList.get(index)
                           .getName()
-                          .equals(user.getName()))
+                          .equals(user.getId()))
                   .findFirst()
                   .orElse(-1);
       if (userIndex > -1) {
@@ -74,12 +95,12 @@ public class InMemoryUserDAO {
     }
 
     /**
-       * Удаляет пользователя по имени.
+       * Удаляет пользователя по id.
        *
-       * @param name Имя пользователя, которого нужно удалить.
+       * @param id id пользователя, которого нужно удалить.
        */
-    public void deleteUser(final String name) {
-      var user = findByName(name);
+    public void deleteUser(final Integer id) {
+      var user = findById(id);
       if (user != null) {
         usersList.remove(user);
       }
