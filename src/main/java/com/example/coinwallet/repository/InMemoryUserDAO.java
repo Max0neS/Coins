@@ -64,7 +64,7 @@ public class InMemoryUserDAO {
     public List<User> findAllByName(final String name) {
         return usersList.stream()
                 .filter(element -> element.getName().equals(name))
-                .collect(Collectors.toList());
+                .toList(); // Используем Stream.toList()
     }
 
     public User findById(final Integer id) {
@@ -81,17 +81,18 @@ public class InMemoryUserDAO {
        * @return Обновленный пользователь или null, если пользователь не найден.
        */
     public User updateUser(final User user) {
-      var userIndex = IntStream.range(0, usersList.size())
-                  .filter(index -> usersList.get(index)
-                          .getName()
-                          .equals(user.getId()))
-                  .findFirst()
-                  .orElse(-1);
-      if (userIndex > -1) {
-        usersList.set(userIndex, user);
-        return user;
-      }
-      return null;
+        // Ищем индекс пользователя по его ID
+        var userIndex = IntStream.range(0, usersList.size())
+                .filter(index -> usersList.get(index).getId().equals(user.getId())) // Сравниваем по ID
+                .findFirst()
+                .orElse(-1); // Если не найден, возвращаем -1
+
+        if (userIndex > -1) {
+            usersList.set(userIndex, user);
+            return user; // Возвращаем обновленного пользователя
+        }
+
+        return null; // Если пользователь не найден, возвращаем null
     }
 
     /**

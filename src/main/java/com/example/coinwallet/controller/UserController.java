@@ -51,7 +51,7 @@ public class UserController {
          */
 
         @PostMapping("save_student")
-        public ResponseEntity<?> createUser(@RequestBody final User newUser) {
+        public ResponseEntity<String> createUser(@RequestBody final User newUser) {
             try {
                service.saveUser(newUser);
                return ResponseEntity.status(HttpStatus.OK).body("successfully save");

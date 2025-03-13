@@ -6,6 +6,7 @@ import com.example.coinwallet.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -43,7 +44,7 @@ public class InMemoryUserService implements UserService {
         if (name != null) {
             return repository.findAllByName(name);
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
 
