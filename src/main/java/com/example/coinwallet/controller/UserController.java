@@ -3,6 +3,8 @@ package com.example.coinwallet.controller;
 import com.example.coinwallet.model.User;
 import com.example.coinwallet.service.UserService;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +80,7 @@ public class UserController {
          * @return найденный пользователь
          */
         @GetMapping("/{id}")
-        public User findById(@PathVariable final Integer id) {
+        public Optional<User> findById(@PathVariable final Long id) {
             return service.findById(id);
         }
 
@@ -99,7 +101,7 @@ public class UserController {
          * @param id id пользователя, которого нужно удалить
          */
         @DeleteMapping("delete_student/{id}")
-        public void deleteUser(@PathVariable final Integer id) {
+        public void deleteUser(@PathVariable final Long id) {
             service.deleteUser(id);
         }
 

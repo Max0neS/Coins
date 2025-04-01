@@ -1,6 +1,8 @@
 package com.example.coinwallet.model;
 
 import java.time.LocalDate;
+
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,24 +10,15 @@ import lombok.Data;
  * Представляет пользователя с личными данными и балансом.
  */
 @Data
-@Builder
+@Entity
+@Table(name = "myUsers")
 public class User {
-
-    /**
-     * Имя пользователя.
-     */
-    private Integer id;
-
-    /**
-       * Имя пользователя.
-       */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
-    /**
-       * Дата рождения пользователя.
-       */
+    @Column(unique = true)
+    private String email;
     private LocalDate dateOfBirth;
-    /**
-       * Баланс, связанный с пользователем.
-       */
     private int balance;
 }

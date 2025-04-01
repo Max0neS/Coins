@@ -3,6 +3,7 @@ package com.example.coinwallet.service;
 import com.example.coinwallet.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     List<User> findAllUser();
@@ -15,9 +16,9 @@ public interface UserService {
 
     List<User> findAllByName(final String name);
 
-    User findById(Integer id);
+    Optional<User> findById(Long id);
 
     User updateUser(User user);
 
-    void deleteUser(Integer id);
+    void deleteUser(Long id);
 }

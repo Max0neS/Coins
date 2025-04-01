@@ -1,29 +1,30 @@
 package com.example.coinwallet.service.impl;
 
 import com.example.coinwallet.model.User;
-import com.example.coinwallet.repository.InMemoryUserDAO;
+import com.example.coinwallet.repository.UserRepository;
 import com.example.coinwallet.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Primary
 @AllArgsConstructor
-public class InMemoryUserService implements UserService {
+public class UserServiceImpl implements UserService {
 
-    private final InMemoryUserDAO repository;
+    private final UserRepository repository;
 
     @Override
     public List<User> findAllUser() {
-        return repository.findAllUser();
+        return repository.findAll();
     }
 
     @Override
     public User saveUser(User newUser) {
-        return repository.saveUser(newUser);
+        return repository.save(newUser);
     }
 
     @Override
@@ -42,25 +43,21 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> findAllByName(String name) {
-        if (name != null) {
-            return repository.findAllByName(name);
-        } else {
-            return Collections.emptyList();
-        }
+        return repository.findAllByName(name);
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        return Optional.ofNullable(repository.findById(id));
+    public Optional<User> findById(final Long id) {
+        return repository.findById(id);
     }
 
     @Override
     public User updateUser(User user) {
-        return repository.updateUser(user);
+        return null;
     }
 
     @Override
     public void deleteUser(Long id) {
-        repository.deleteUser(id);
+        repository.deleteById(id);
     }
 }

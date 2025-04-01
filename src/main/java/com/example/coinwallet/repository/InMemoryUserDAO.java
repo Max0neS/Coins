@@ -37,12 +37,6 @@ public class InMemoryUserDAO {
        * @return Сохраненный пользователь.
        */
     public User saveUser(final User newUser) {
-        for (User user : usersList) {
-            if (user.getId().equals(newUser.getId())) {
-                throw new IllegalArgumentException("Пользователь с ID " + newUser.getId() + " уже существует.");
-            }
-        }
-
         usersList.add(newUser);
         return newUser;
     }
@@ -67,7 +61,7 @@ public class InMemoryUserDAO {
                 .toList(); // Используем Stream.toList()
     }
 
-    public User findById(final Integer id) {
+    public User findById(final Long id) {
         return usersList.stream()
                 .filter(element -> element.getId().equals(id)) // Фильтруем по id
                 .findFirst() // Находим первый элемент, который соответствует фильтру
@@ -100,7 +94,7 @@ public class InMemoryUserDAO {
        *
        * @param id id пользователя, которого нужно удалить.
        */
-    public void deleteUser(final Integer id) {
+    public void deleteUser(final Long id) {
       var user = findById(id);
       if (user != null) {
         usersList.remove(user);
