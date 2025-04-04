@@ -1,7 +1,6 @@
 package com.example.coinwallet.service.impl;
 
-import com.example.coinwallet.dto.UserDTO;
-import com.example.coinwallet.dto.UserWithTransactionsDTO;
+import com.example.coinwallet.dto.*;
 import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.User;
 import com.example.coinwallet.repository.UserRepository;
@@ -75,5 +74,34 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<UserWithTransactionsDTO> getAllUsersWithTransactionsAndCategories() {
+        List<User> users = userRepository.findAllWithTransactionsAndCategories();
+
+        return users.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private UserWithTransactionsDTO convertToDto(User user) {
+        UserWithTransactionsDTO dto = modelMapper.map(user, UserWithTransactionsDTO.class);
+
+        dto.setTransactions(user.getTransactions().stream()
+                .map(t -> {
+                    TransactionWithCategoriesDTO tDto =
+                            modelMapper.map(t, TransactionWithCategoriesDTO.class);
+
+                    tDto.setCategories(t.getCategories().stream()
+                            .map(c -> modelMapper.map(c, CategoryDTO.class))
+                            .collect(Collectors.toList()));
+
+                    return tDto;
+                })
+                .collect(Collectors.toList()));
+
+        return dto;
     }
 }

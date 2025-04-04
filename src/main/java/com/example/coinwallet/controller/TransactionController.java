@@ -2,6 +2,7 @@ package com.example.coinwallet.controller;
 
 import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
+import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
 import com.example.coinwallet.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,4 +45,12 @@ public class TransactionController {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/with-details")
+    public ResponseEntity<List<TransactionWithUserAndCategoriesDTO>> getAllTransactionsWithDetails() {
+        List<TransactionWithUserAndCategoriesDTO> transactions =
+                transactionService.getAllTransactionsWithUserAndCategories();
+        return ResponseEntity.ok(transactions);
+    }
+
 }

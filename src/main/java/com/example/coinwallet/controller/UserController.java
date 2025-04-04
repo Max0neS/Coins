@@ -50,4 +50,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/with-transactions")
+    public ResponseEntity<List<UserWithTransactionsDTO>> getAllUsersWithTransactions() {
+        List<UserWithTransactionsDTO> users =
+                userService.getAllUsersWithTransactionsAndCategories();
+        return ResponseEntity.ok(users);
+    }
 }

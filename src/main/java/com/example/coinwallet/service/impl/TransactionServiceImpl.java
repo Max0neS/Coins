@@ -2,6 +2,7 @@ package com.example.coinwallet.service.impl;
 
 import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
+import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
 import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.*;
 import com.example.coinwallet.repository.TransactionRepository;
@@ -62,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionDTO> findAllByUserId(Long userId) {
-        return transactionRepository.findByUser_Id(userId).stream()
+        return transactionRepository.findByUserId(userId).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
                 .collect(Collectors.toList());
     }
@@ -112,5 +113,21 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         transactionRepository.delete(transaction);
+    }
+
+    @Override
+    public List<TransactionWithUserAndCategoriesDTO> getAllTransactionsWithUserAndCategories() {
+        List<Transaction> transactions = transactionRepository.findAllWithUserAndCategories();
+
+        return transactions.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private TransactionWithUserAndCategoriesDTO convertToDto(Transaction transaction) {
+        TransactionWithUserAndCategoriesDTO dto = modelMapper.map(transaction, TransactionWithUserAndCategoriesDTO.class);
+        dto.setUserId(transaction.getUser().getId());
+        dto.setUserName(transaction.getUser().getName());
+        return dto;
     }
 }

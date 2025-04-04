@@ -9,5 +9,5 @@ public class UserWithTransactionsDTO {
     private String name;
     private String email;
     private int balance;
-    private List<TransactionDTO> transactions;
+    private List<TransactionWithCategoriesDTO> transactions;
 }

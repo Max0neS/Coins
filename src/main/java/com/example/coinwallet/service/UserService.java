@@ -3,6 +3,7 @@ package com.example.coinwallet.service;
 import com.example.coinwallet.dto.UserDTO;
 import com.example.coinwallet.dto.UserWithTransactionsDTO;
 import com.example.coinwallet.model.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,7 @@ public interface UserService {
     UserDTO updateUser(Long id, User user);
 
     void deleteUser(Long id);
+
+    @Transactional(readOnly = true)
+    List<UserWithTransactionsDTO> getAllUsersWithTransactionsAndCategories();
 }
