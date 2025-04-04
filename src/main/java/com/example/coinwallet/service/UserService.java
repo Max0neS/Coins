@@ -6,7 +6,6 @@ import com.example.coinwallet.model.User;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
     List<UserDTO> findAllUsers();

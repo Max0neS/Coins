@@ -3,7 +3,6 @@ package com.example.coinwallet.service;
 import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
 import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
-import com.example.coinwallet.model.Transaction;
 
 import java.util.List;
 
