@@ -19,6 +19,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
+    private static final String EMAIL_ALREADY_EXISTS_MESSAGE = "Email already exists";
+
     @Override
     public List<UserDTO> findAllUsers() {
         return userRepository.findAll().stream()
@@ -30,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO saveUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException(EMAIL_ALREADY_EXISTS_MESSAGE);
         }
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDTO.class);
@@ -39,14 +42,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
         return modelMapper.map(user, UserDTO.class);
     }
 
     @Override
     public UserWithTransactionsDTO findUserWithTransactions(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
         return modelMapper.map(user, UserWithTransactionsDTO.class);
     }
 
@@ -54,11 +57,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(Long id, User user) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
         if (!existingUser.getEmail().equals(user.getEmail())
                 && userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException(EMAIL_ALREADY_EXISTS_MESSAGE);
         }
 
         existingUser.setName(user.getName());
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
         userRepository.delete(user);
     }
 

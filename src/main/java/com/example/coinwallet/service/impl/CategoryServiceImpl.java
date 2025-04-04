@@ -20,11 +20,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
+    private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
+    private static final String CATEGORY_ALREADY_EXISTS_MESSAGE = "Category with this name already exists";
+
     @Override
     @Transactional
     public CategoryDTO createCategory(Category category) {
         if (categoryRepository.existsByName(category.getName())) {
-            throw new IllegalArgumentException("Category with this name already exists");
+            throw new IllegalArgumentException(CATEGORY_ALREADY_EXISTS_MESSAGE);
         }
         Category savedCategory = categoryRepository.save(category);
         return modelMapper.map(savedCategory, CategoryDTO.class);
@@ -33,14 +36,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO findById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + id));
         return modelMapper.map(category, CategoryDTO.class);
     }
 
     @Override
     public CategoryWithTransactionsDTO findCategoryWithTransactions(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + id));
         return modelMapper.map(category, CategoryWithTransactionsDTO.class);
     }
 
@@ -55,11 +58,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDTO updateCategory(Long id, Category category) {
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + id));
 
-        if (!existingCategory.getName().equals(category.getName()) &&
-                categoryRepository.existsByName(category.getName())) {
-            throw new IllegalArgumentException("Category with this name already exists");
+        if (!existingCategory.getName().equals(category.getName())
+                && categoryRepository.existsByName(category.getName())) {
+            throw new IllegalArgumentException(CATEGORY_ALREADY_EXISTS_MESSAGE);
         }
 
         existingCategory.setName(category.getName());
@@ -71,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + id));
 
         // Удаляем связи с транзакциями перед удалением категории
         category.getTransactions().forEach(transaction ->
