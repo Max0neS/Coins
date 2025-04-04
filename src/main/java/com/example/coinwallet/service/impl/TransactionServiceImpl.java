@@ -4,10 +4,12 @@ import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
 import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
 import com.example.coinwallet.exception.ResourceNotFoundException;
-import com.example.coinwallet.model.*;
+import com.example.coinwallet.model.Category;
+import com.example.coinwallet.model.Transaction;
+import com.example.coinwallet.model.User;
+import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.repository.TransactionRepository;
 import com.example.coinwallet.repository.UserRepository;
-import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,25 +29,23 @@ public class TransactionServiceImpl implements TransactionService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
+    private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
+    private static final String TRANSACTION_NOT_FOUND_MESSAGE = "Transaction not found with id: ";
+
     @Override
     @Transactional
     public TransactionDTO createTransaction(TransactionCreateDTO transactionDTO) {
         User user = userRepository.findById(transactionDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + transactionDTO.getUserId()));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + transactionDTO.getUserId()));
 
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
         transaction.setUser(user);
 
-        // Очищаем и переустанавливаем категории безопасным способом
-        Set<Category> categories = new HashSet<>();
-        for (Long categoryId : transactionDTO.getCategoryIds()) {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
-            categories.add(category);
-        }
+        Set<Category> categories = getCategories(transactionDTO.getCategoryIds());
+
         transaction.setCategories(categories);
 
-        // Обновляем баланс пользователя
         user.updateBalance(transaction.getAmount(), transaction.isType());
         userRepository.save(user);
 
@@ -53,11 +53,10 @@ public class TransactionServiceImpl implements TransactionService {
         return modelMapper.map(savedTransaction, TransactionDTO.class);
     }
 
-    // Остальные методы остаются без изменений
     @Override
     public TransactionDTO findById(Long id) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id));
         return modelMapper.map(transaction, TransactionDTO.class);
     }
 
@@ -72,19 +71,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionDTO updateTransaction(Long id, TransactionCreateDTO transactionDTO) {
         Transaction existingTransaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id));
 
         User user = userRepository.findById(transactionDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + transactionDTO.getUserId()));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + transactionDTO.getUserId()));
 
-        Set<Category> categories = new HashSet<>();
-        for (Long categoryId : transactionDTO.getCategoryIds()) {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
-            categories.add(category);
-        }
+        Set<Category> categories = getCategories(transactionDTO.getCategoryIds());
 
-        // Восстанавливаем старый баланс
         user.updateBalance(-existingTransaction.getAmount(), existingTransaction.isType());
 
         existingTransaction.setName(transactionDTO.getName());
@@ -94,7 +87,6 @@ public class TransactionServiceImpl implements TransactionService {
         existingTransaction.setUser(user);
         existingTransaction.setCategories(categories);
 
-        // Применяем новую транзакцию
         user.updateBalance(existingTransaction.getAmount(), existingTransaction.isType());
         userRepository.save(user);
 
@@ -106,7 +98,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void deleteTransaction(Long id) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id));
 
         User user = transaction.getUser();
         user.updateBalance(-transaction.getAmount(), transaction.isType());
@@ -129,5 +121,15 @@ public class TransactionServiceImpl implements TransactionService {
         dto.setUserId(transaction.getUser().getId());
         dto.setUserName(transaction.getUser().getName());
         return dto;
+    }
+
+    private Set<Category> getCategories(List<Long> categoryIds) {
+        Set<Category> categories = new HashSet<>();
+        for (Long categoryId : categoryIds) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + categoryId));
+            categories.add(category);
+        }
+        return categories;
     }
 }

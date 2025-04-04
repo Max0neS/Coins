@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Base ###
-!**/src/main/resources/application.yaml
+src/main/resources/application.yaml
