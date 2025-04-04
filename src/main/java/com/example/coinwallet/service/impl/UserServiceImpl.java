@@ -1,63 +1,79 @@
 package com.example.coinwallet.service.impl;
 
+import com.example.coinwallet.dto.UserDTO;
+import com.example.coinwallet.dto.UserWithTransactionsDTO;
+import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.User;
 import com.example.coinwallet.repository.UserRepository;
 import com.example.coinwallet.service.UserService;
-import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Primary;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@Primary
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    public List<User> findAllUser() {
-        return repository.findAll();
+    public List<UserDTO> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> modelMapper.map(user, UserDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User saveUser(User newUser) {
-        return repository.save(newUser);
-    }
-
-    @Override
-    public User searchUser(String name) {
-        if (name != null) {
-            return repository.findByName(name);
-        } else {
-            return null;
+    @Transactional
+    public UserDTO saveUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
         }
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDTO.class);
     }
 
     @Override
-    public User findByName(String name) {
-        return repository.findByName(name);
+    public UserDTO findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @Override
-    public List<User> findAllByName(String name) {
-        return repository.findAllByName(name);
+    public UserWithTransactionsDTO findUserWithTransactions(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        return modelMapper.map(user, UserWithTransactionsDTO.class);
     }
 
     @Override
-    public Optional<User> findById(final Long id) {
-        return repository.findById(id);
+    @Transactional
+    public UserDTO updateUser(Long id, User user) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (!existingUser.getEmail().equals(user.getEmail()) &&
+                userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        existingUser.setName(user.getName());
+        existingUser.setEmail(user.getEmail());
+
+        User updatedUser = userRepository.save(existingUser);
+        return modelMapper.map(updatedUser, UserDTO.class);
     }
 
     @Override
-    public User updateUser(User user) {
-        return null;
-    }
-
-    @Override
+    @Transactional
     public void deleteUser(Long id) {
-        repository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        userRepository.delete(user);
     }
 }

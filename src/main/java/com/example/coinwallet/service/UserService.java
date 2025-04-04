@@ -1,24 +1,22 @@
 package com.example.coinwallet.service;
 
+import com.example.coinwallet.dto.UserDTO;
+import com.example.coinwallet.dto.UserWithTransactionsDTO;
 import com.example.coinwallet.model.User;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List<User> findAllUser();
+    List<UserDTO> findAllUsers();
 
-    User saveUser(User newUser);
+    UserDTO saveUser(User user);
 
-    User searchUser(String name);
+    UserDTO findById(Long id);
 
-    User findByName(String name);
+    UserWithTransactionsDTO findUserWithTransactions(Long id);
 
-    List<User> findAllByName(final String name);
-
-    Optional<User> findById(Long id);
-
-    User updateUser(User user);
+    UserDTO updateUser(Long id, User user);
 
     void deleteUser(Long id);
 }

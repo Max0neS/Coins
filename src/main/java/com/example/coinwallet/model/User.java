@@ -1,24 +1,36 @@
 package com.example.coinwallet.model;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-/**
- * Представляет пользователя с личными данными и балансом.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
-@Table(name = "myUsers")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
-    @Column(unique = true)
+
+    @Column(nullable = false, unique = true)
     private String email;
-    private LocalDate dateOfBirth;
-    private int balance;
+
+    @Column(nullable = false)
+    private int balance = 0;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Transaction> transactions = new ArrayList<>();
+
+    public void updateBalance(int amount, boolean isIncome) {
+        this.balance += isIncome ? amount : -amount;
+    }
 }
