@@ -64,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionDTO> findAllByUserId(Long userId) {
         return transactionRepository.findByUserId(userId).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
-                .collect(Collectors.toList());
+                .toList(); // Изменено здесь
     }
 
     @Override
@@ -113,7 +113,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return transactions.stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList(); // Изменено здесь
     }
 
     private TransactionWithUserAndCategoriesDTO convertToDto(Transaction transaction) {

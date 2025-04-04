@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> findAllUsers() {
         return userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
-                .collect(Collectors.toList());
+                .toList(); // Изменено здесь
     }
 
     @Override
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
 
         return users.stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList(); // Изменено здесь
     }
 
     private UserWithTransactionsDTO convertToDto(User user) {

@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDTO> findAll() {
         return categoryRepository.findAll().stream()
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
-                .collect(Collectors.toList());
+                .toList(); // Изменено здесь
     }
 
     @Override
