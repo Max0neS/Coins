@@ -10,7 +10,7 @@ import com.example.coinwallet.model.User;
 import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.repository.TransactionRepository;
 import com.example.coinwallet.repository.UserRepository;
-import com.example.coinwallet.service.TransactionCache;
+import com.example.coinwallet.utils.TransactionCache;
 import com.example.coinwallet.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -139,7 +139,6 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Transaction> findAll() {
         return transactionRepository.findAll();
     }
-
 
     @Override
     public List<Transaction> findByUserIdAndTypeJPQL(Long userId, boolean type) {

@@ -1,4 +1,4 @@
-package com.example.coinwallet.service;
+package com.example.coinwallet.utils;
 
 import com.example.coinwallet.model.Transaction;
 import org.springframework.stereotype.Component;

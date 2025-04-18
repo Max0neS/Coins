@@ -3,7 +3,7 @@ package com.example.coinwallet.controller;
 import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
 import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
-import com.example.coinwallet.service.TransactionCache;
+import com.example.coinwallet.utils.TransactionCache;
 import com.example.coinwallet.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -65,7 +65,7 @@ public class TransactionController {
             @RequestParam boolean type) {
         List<TransactionDTO> transactions = transactionService.findByUserIdAndTypeJPQL(userId, type).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(transactions);
     }
 
@@ -75,7 +75,7 @@ public class TransactionController {
             @RequestParam boolean type) {
         List<TransactionDTO> transactions = transactionService.findByUserIdAndTypeNative(userId, type).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(transactions);
     }
 
