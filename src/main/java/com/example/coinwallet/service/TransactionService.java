@@ -22,7 +22,7 @@ public interface TransactionService {
 
     List<Transaction> findAll();
 
-    List<Transaction> findByUserNameAndTypeJPQL(String userName, boolean type);
+    List<Transaction> findByUserIdAndTypeJPQL(Long userId, boolean type);
 
-    List<Transaction> findByUserNameAndTypeNative(String userName, boolean type);
+    List<Transaction> findByUserIdAndTypeNative(Long userId, boolean type);
 }

@@ -1,4 +1,4 @@
-package com.example.coinwallet.utils;
+package com.example.coinwallet.service;
 
 import com.example.coinwallet.model.Transaction;
 import org.springframework.stereotype.Component;
@@ -10,18 +10,13 @@ import java.util.Map;
 @Component
 public class TransactionCache {
 
-    // Кэш: ключ - строка вида "userName:type", значение - список транзакций
     private final Map<String, List<Transaction>> cache = new HashMap<>();
 
-    // Получение данных из кэша
-    public List<Transaction> getTransactions(String userName, boolean type) {
-        String key = userName + ":" + type;
+    public List<Transaction> getTransactions(String key) {
         return cache.get(key);
     }
 
-    // Добавление данных в кэш
-    public void putTransactions(String userName, boolean type, List<Transaction> transactions) {
-        String key = userName + ":" + type;
+    public void putTransactions(String key, List<Transaction> transactions) {
         cache.put(key, transactions);
     }
 

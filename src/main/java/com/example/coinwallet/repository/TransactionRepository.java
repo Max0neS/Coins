@@ -19,10 +19,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findAllWithUserAndCategories();
 
-    @Query("SELECT t FROM Transaction t WHERE t.user.name = :userName AND t.type = :type")
-    List<Transaction> findByUserNameAndTypeJPQL(@Param("userName") String userName, @Param("type") boolean type);
+    // JPQL-запрос: фильтрация транзакций по userId и типу
+    @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId AND t.type = :type")
+    List<Transaction> findByUserIdAndTypeJPQL(@Param("userId") Long userId, @Param("type") boolean type);
 
-    // Native SQL-запрос: фильтрация транзакций по имени пользователя и типу
-    @Query(value = "SELECT t.* FROM transactions t JOIN my_users u ON t.user_id = u.id WHERE u.name = :userName AND t.type = :type", nativeQuery = true)
-    List<Transaction> findByUserNameAndTypeNative(@Param("userName") String userName, @Param("type") boolean type);
+    // Native SQL-запрос: фильтрация транзакций по userId и типу
+    @Query(value = "SELECT t.* FROM transactions t JOIN users u ON t.user_id = u.id WHERE u.id = :userId AND t.type = :type", nativeQuery = true)
+    List<Transaction> findByUserIdAndTypeNative(@Param("userId") Long userId, @Param("type") boolean type);
 }
