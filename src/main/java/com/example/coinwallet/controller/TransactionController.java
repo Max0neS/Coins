@@ -4,18 +4,23 @@ import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
 import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
 import com.example.coinwallet.service.TransactionService;
+import com.example.coinwallet.utils.TransactionCache;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
 @AllArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
+    private final ModelMapper modelMapper;
+    private final TransactionCache transactionCache;
 
     @PostMapping
     public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionCreateDTO transactionDTO) {
@@ -51,6 +56,34 @@ public class TransactionController {
         List<TransactionWithUserAndCategoriesDTO> transactions =
                 transactionService.getAllTransactionsWithUserAndCategories();
         return ResponseEntity.ok(transactions);
+    }
+
+    // GET-запрос с фильтрацией через JPQL
+    @GetMapping("/filter/jpql")
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByUserNameAndTypeJPQL(
+            @RequestParam String userName,
+            @RequestParam boolean type) {
+        List<TransactionDTO> transactions = transactionService.findByUserNameAndTypeJPQL(userName, type).stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(transactions);
+    }
+
+    // GET-запрос с фильтрацией через Native Query
+    @GetMapping("/filter/native")
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByUserNameAndTypeNative(
+            @RequestParam String userName,
+            @RequestParam boolean type) {
+        List<TransactionDTO> transactions = transactionService.findByUserNameAndTypeNative(userName, type).stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(transactions);
+    }
+
+    @PostMapping("/clear-cache")
+    public ResponseEntity<String> clearCache() {
+        transactionCache.clearCache();
+        return ResponseEntity.ok("Cache cleared");
     }
 
 }

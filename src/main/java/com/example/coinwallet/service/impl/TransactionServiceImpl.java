@@ -11,6 +11,7 @@ import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.repository.TransactionRepository;
 import com.example.coinwallet.repository.UserRepository;
 import com.example.coinwallet.service.TransactionService;
+import com.example.coinwallet.utils.TransactionCache;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+    private final TransactionCache transactionCache;
 
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
     private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
@@ -131,5 +133,38 @@ public class TransactionServiceImpl implements TransactionService {
             categories.add(category);
         }
         return categories;
+    }
+
+    @Override
+    public List<Transaction> findAll() {
+        return transactionRepository.findAll();
+    }
+
+    @Override
+    public List<Transaction> findByUserNameAndTypeJPQL(String userName, boolean type) {
+        // Проверяем кэш
+        List<Transaction> cachedTransactions = transactionCache.getTransactions(userName, type);
+        if (cachedTransactions != null) {
+            return cachedTransactions;
+        }
+
+        // Если данных нет в кэше, выполняем запрос
+        List<Transaction> transactions = transactionRepository.findByUserNameAndTypeJPQL(userName, type);
+        transactionCache.putTransactions(userName, type, transactions); // Сохраняем в кэш
+        return transactions;
+    }
+
+    @Override
+    public List<Transaction> findByUserNameAndTypeNative(String userName, boolean type) {
+        // Проверяем кэш
+        List<Transaction> cachedTransactions = transactionCache.getTransactions(userName, type);
+        if (cachedTransactions != null) {
+            return cachedTransactions;
+        }
+
+        // Если данных нет в кэше, выполняем запрос
+        List<Transaction> transactions = transactionRepository.findByUserNameAndTypeNative(userName, type);
+        transactionCache.putTransactions(userName, type, transactions); // Сохраняем в кэш
+        return transactions;
     }
 }
