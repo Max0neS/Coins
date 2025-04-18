@@ -46,8 +46,12 @@ public class Transaction {
     // Явно определяем equals и hashCode
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Transaction)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Transaction)) {
+            return false;
+        }
         Transaction that = (Transaction) o;
         return id != null && id.equals(that.id);
     }

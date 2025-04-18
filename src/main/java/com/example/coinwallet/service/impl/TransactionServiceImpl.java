@@ -106,6 +106,10 @@ public class TransactionServiceImpl implements TransactionService {
         user.updateBalance(-transaction.getAmount(), transaction.isType());
         userRepository.save(user);
 
+        // Удаляем запись из кэша
+        String cacheKey = user.getId() + ":" + transaction.isType();
+        transactionCache.removeTransactions(cacheKey);
+
         transactionRepository.delete(transaction);
     }
 
