@@ -53,4 +53,9 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
+    @GetMapping("/by-categories")
+    public ResponseEntity<List<TransactionWithUserAndCategoriesDTO>> findByCategoryIds(@RequestParam List<Long> categoryIds) {
+        return ResponseEntity.ok(transactionService.findByCategoryIds(categoryIds));
+    }
+
 }

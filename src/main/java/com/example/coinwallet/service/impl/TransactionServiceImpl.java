@@ -116,6 +116,13 @@ public class TransactionServiceImpl implements TransactionService {
                 .toList(); // Изменено здесь
     }
 
+    @Override
+    public List<TransactionWithUserAndCategoriesDTO> findByCategoryIds(List<Long> categoryIds) {
+        return transactionRepository.findByCategoryIds(categoryIds, (long) categoryIds.size()).stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
     private TransactionWithUserAndCategoriesDTO convertToDto(Transaction transaction) {
         TransactionWithUserAndCategoriesDTO dto = modelMapper.map(transaction, TransactionWithUserAndCategoriesDTO.class);
         dto.setUserId(transaction.getUser().getId());
@@ -132,4 +139,5 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return categories;
     }
+
 }

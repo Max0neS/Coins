@@ -18,4 +18,6 @@ public interface TransactionService {
     void deleteTransaction(Long id);
 
     List<TransactionWithUserAndCategoriesDTO> getAllTransactionsWithUserAndCategories();
+
+    List<TransactionWithUserAndCategoriesDTO> findByCategoryIds(List<Long> categoryIds);
 }
