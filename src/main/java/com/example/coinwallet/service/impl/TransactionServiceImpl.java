@@ -76,9 +76,6 @@ public class TransactionServiceImpl implements TransactionService {
             return cachedTransactions;
         }
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + userId));
-
         List<TransactionDTO> transactions = transactionRepository.findByUserId(userId).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
                 .toList();
