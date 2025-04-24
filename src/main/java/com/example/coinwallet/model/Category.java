@@ -24,7 +24,6 @@ public class Category {
     @EqualsAndHashCode.Exclude
     private Set<Transaction> transactions = new HashSet<>();
 
-    // Явно определяем equals и hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) {

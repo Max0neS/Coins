@@ -22,7 +22,7 @@ public class Transaction {
     private String description;
 
     @Column(nullable = false)
-    private boolean type; // true - income, false - expense
+    private boolean type;
 
     @Column(nullable = false)
     private int amount;
@@ -43,7 +43,6 @@ public class Transaction {
     @EqualsAndHashCode.Exclude
     private Set<Category> categories = new HashSet<>();
 
-    // Явно определяем equals и hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) {
