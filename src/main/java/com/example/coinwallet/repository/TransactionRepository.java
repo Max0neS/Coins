@@ -12,7 +12,9 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByUser(User user);
 
-    List<Transaction> findByUserId(Long userId);
+    // MODIFIED: Added JOIN FETCH to load categories eagerly
+    @Query("SELECT t FROM Transaction t LEFT JOIN FETCH t.categories WHERE t.user.id = :userId")
+    List<Transaction> findByUserId(@org.springframework.data.repository.query.Param("userId") Long userId);
 
     @Query("SELECT t FROM Transaction t LEFT JOIN FETCH t.user LEFT JOIN FETCH t.categories")
     List<Transaction> findAllWithUserAndCategories();

@@ -2,6 +2,7 @@ package com.example.coinwallet.controller;
 
 import com.example.coinwallet.dto.TransactionCreateDTO;
 import com.example.coinwallet.dto.TransactionDTO;
+import com.example.coinwallet.utils.InMemoryCache;
 import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
 import com.example.coinwallet.service.TransactionService;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
+    private final InMemoryCache cache;
 
     @PostMapping
     public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionCreateDTO transactionDTO) {
@@ -56,6 +58,12 @@ public class TransactionController {
     @GetMapping("/by-categories")
     public ResponseEntity<List<TransactionWithUserAndCategoriesDTO>> findByCategoryIds(@RequestParam List<Long> categoryIds) {
         return ResponseEntity.ok(transactionService.findByCategoryIds(categoryIds));
+    }
+
+    @PostMapping("/cache/clear")
+    public ResponseEntity<Void> clearCache() {
+        cache.clear();
+        return ResponseEntity.noContent().build();
     }
 
 }

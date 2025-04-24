@@ -7,6 +7,9 @@ import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.Category;
 import com.example.coinwallet.model.Transaction;
 import com.example.coinwallet.model.User;
+import com.example.coinwallet.utils.InMemoryCache; // NEW
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.repository.TransactionRepository;
 import com.example.coinwallet.repository.UserRepository;
@@ -29,6 +32,9 @@ public class TransactionServiceImpl implements TransactionService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
+    private final InMemoryCache cache; // NEW
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class); // NEW
+
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
     private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
     private static final String TRANSACTION_NOT_FOUND_MESSAGE = "Transaction not found with id: ";
@@ -50,6 +56,9 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
+        cache.remove(transactionDTO.getUserId());
+        LOGGER.info("Created transaction for userId: {}, invalidated cache", transactionDTO.getUserId());
+
         return modelMapper.map(savedTransaction, TransactionDTO.class);
     }
 
@@ -62,9 +71,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionDTO> findAllByUserId(Long userId) {
-        return transactionRepository.findByUserId(userId).stream()
+        // NEW: Check cache first
+        List<TransactionDTO> cachedTransactions = cache.get(userId);
+        if (cachedTransactions != null) {
+            return cachedTransactions;
+        }
+
+        List<TransactionDTO> transactions = transactionRepository.findByUserId(userId).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
-                .toList(); // Изменено здесь
+                .toList();
+        cache.put(userId, transactions);
+        LOGGER.info("Fetched transactions from database and stored in cache for userId: {}", userId);
+        return transactions;
     }
 
     @Override
@@ -91,6 +109,8 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         Transaction updatedTransaction = transactionRepository.save(existingTransaction);
+        cache.remove(transactionDTO.getUserId());
+        LOGGER.info("Updated transaction for userId: {}, invalidated cache", transactionDTO.getUserId());
         return modelMapper.map(updatedTransaction, TransactionDTO.class);
     }
 
@@ -105,6 +125,9 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         transactionRepository.delete(transaction);
+
+        cache.remove(user.getId());
+        LOGGER.info("Deleted transaction for userId: {}, invalidated cache", user.getId());
     }
 
     @Override
@@ -131,13 +154,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Set<Category> getCategories(List<Long> categoryIds) {
-        Set<Category> categories = new HashSet<>();
-        for (Long categoryId : categoryIds) {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + categoryId));
-            categories.add(category);
+        // MODIFIED: Use findAllById to fetch all categories in one query
+        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (categories.size() != categoryIds.size()) {
+            throw new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + categoryIds);
         }
-        return categories;
+        return new HashSet<>(categories);
     }
 
 }

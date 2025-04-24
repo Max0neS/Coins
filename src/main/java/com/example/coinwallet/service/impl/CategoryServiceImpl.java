@@ -6,8 +6,11 @@ import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.Category;
 import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.service.CategoryService;
+import com.example.coinwallet.utils.InMemoryCache;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,9 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+
+    private final InMemoryCache cache; // NEW
+    private static final Logger LOGGER = LoggerFactory.getLogger(CategoryServiceImpl.class); // NEW
 
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
     private static final String CATEGORY_ALREADY_EXISTS_MESSAGE = "Category with this name already exists";
@@ -76,10 +82,16 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + id));
 
-        // Удаляем связи с транзакциями перед удалением категории
+        category.getTransactions().forEach(transaction -> {
+            Long userId = transaction.getUser().getId();
+            cache.remove(userId);
+            LOGGER.info("Invalidated cache for userId: {} due to category deletion", userId);
+        });
+
         category.getTransactions().forEach(transaction ->
                 transaction.getCategories().remove(category));
 
         categoryRepository.delete(category);
+        LOGGER.info("Deleted category with id: {}", id);
     }
 }

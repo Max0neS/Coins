@@ -5,8 +5,11 @@ import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.User;
 import com.example.coinwallet.repository.UserRepository;
 import com.example.coinwallet.service.UserService;
+import com.example.coinwallet.utils.InMemoryCache;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+
+    private final InMemoryCache cache; // NEW
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class); // NEW
 
     private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
     private static final String EMAIL_ALREADY_EXISTS_MESSAGE = "Email already exists";
@@ -74,9 +80,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
-        userRepository.delete(user);
+        // MODIFIED: Replaced findById and delete with existsById and deleteById
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id);
+        }
+        userRepository.deleteById(id);
+        cache.remove(id);
+        LOGGER.info("Deleted user with id: {}, invalidated cache", id);
     }
 
     @Transactional(readOnly = true)
