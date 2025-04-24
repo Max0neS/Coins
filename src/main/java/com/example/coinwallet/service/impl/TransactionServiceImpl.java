@@ -11,6 +11,7 @@ import com.example.coinwallet.repository.CategoryRepository;
 import com.example.coinwallet.repository.TransactionRepository;
 import com.example.coinwallet.repository.UserRepository;
 import com.example.coinwallet.service.TransactionService;
+import com.example.coinwallet.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
     private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
@@ -50,6 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
+        userService.updateUserCache(user.getId());
         return modelMapper.map(savedTransaction, TransactionDTO.class);
     }
 
@@ -64,7 +67,7 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionDTO> findAllByUserId(Long userId) {
         return transactionRepository.findByUserId(userId).stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
-                .toList(); // Изменено здесь
+                .toList();
     }
 
     @Override
@@ -91,6 +94,7 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         Transaction updatedTransaction = transactionRepository.save(existingTransaction);
+        userService.updateUserCache(user.getId());
         return modelMapper.map(updatedTransaction, TransactionDTO.class);
     }
 
@@ -105,6 +109,7 @@ public class TransactionServiceImpl implements TransactionService {
         userRepository.save(user);
 
         transactionRepository.delete(transaction);
+        userService.updateUserCache(user.getId());
     }
 
     @Override

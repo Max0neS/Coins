@@ -22,4 +22,12 @@ public interface UserService {
 
     @Transactional(readOnly = true)
     List<UserWithTransactionsDTO> getAllUsersWithTransactionsAndCategories();
+
+    void clearCache();
+
+    void cacheUser(Long userId, UserWithTransactionsDTO user);
+
+    void removeUserFromCache(Long userId);
+
+    void updateUserCache(Long userId);
 }

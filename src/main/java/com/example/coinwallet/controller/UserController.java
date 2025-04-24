@@ -57,4 +57,10 @@ public class UserController {
                 userService.getAllUsersWithTransactionsAndCategories();
         return ResponseEntity.ok(users);
     }
+
+    @PostMapping("/clear-cache")
+    public ResponseEntity<Void> clearCache() {
+        userService.clearCache();
+        return ResponseEntity.ok().build();
+    }
 }
