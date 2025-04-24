@@ -7,7 +7,7 @@ import com.example.coinwallet.exception.ResourceNotFoundException;
 import com.example.coinwallet.model.Category;
 import com.example.coinwallet.model.Transaction;
 import com.example.coinwallet.model.User;
-import com.example.coinwallet.utils.InMemoryCache; // NEW
+import com.example.coinwallet.utils.InMemoryCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.coinwallet.repository.CategoryRepository;
@@ -32,8 +32,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
-    private final InMemoryCache cache; // NEW
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class); // NEW
+    private final InMemoryCache cache;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
     private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
@@ -71,7 +71,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionDTO> findAllByUserId(Long userId) {
-        // NEW: Check cache first
         List<TransactionDTO> cachedTransactions = cache.get(userId);
         if (cachedTransactions != null) {
             return cachedTransactions;
@@ -136,7 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return transactions.stream()
                 .map(this::convertToDto)
-                .toList(); // Изменено здесь
+                .toList();
     }
 
     @Override
@@ -154,7 +153,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Set<Category> getCategories(List<Long> categoryIds) {
-        // MODIFIED: Use findAllById to fetch all categories in one query
         List<Category> categories = categoryRepository.findAllById(categoryIds);
         if (categories.size() != categoryIds.size()) {
             throw new ResourceNotFoundException(CATEGORY_NOT_FOUND_MESSAGE + categoryIds);

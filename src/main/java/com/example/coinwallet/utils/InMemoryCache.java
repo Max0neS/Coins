@@ -17,12 +17,15 @@ public class InMemoryCache {
     private final Map<Long, List<TransactionDTO>> cache;
 
     public InMemoryCache() {
-        this.cache = new LinkedHashMap<Long, List<TransactionDTO>>(MAX_CACHE_SIZE, 0.75f, true) {
+        this.cache = new LinkedHashMap<Long, List<TransactionDTO>>(MAX_CACHE_SIZE,
+                0.75f,
+                true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<Long, List<TransactionDTO>> eldest) {
                 boolean shouldRemove = size() > MAX_CACHE_SIZE;
                 if (shouldRemove) {
-                    LOGGER.info("Cache overflow, removing least recently used entry for userId: {}", eldest.getKey());
+                    LOGGER.info("Cache overflow, removing least recently used entry for userId: {}",
+                            eldest.getKey());
                 }
                 return shouldRemove;
             }
