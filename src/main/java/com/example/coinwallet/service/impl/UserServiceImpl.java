@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
         cache.remove(id);
-        LOGGER.info("Deleted user with id: {}, invalidated cache", id);
+        LOGGER.info("Deleted user with id: {}", id);
     }
 
     @Transactional(readOnly = true)

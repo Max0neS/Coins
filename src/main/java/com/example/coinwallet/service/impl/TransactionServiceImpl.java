@@ -81,7 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
                 .toList();
         cache.put(userId, transactions);
-        LOGGER.info("Fetched transactions from database and stored in cache for userId: {}", userId);
+        //LOGGER.info("Fetched transactions from database and stored in cache for userId: {}", userId);
         return transactions;
     }
 
