@@ -1,11 +1,17 @@
 package com.example.coinwallet.model;
 
+import com.example.coinwallet.dto.CategoryDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,14 +22,18 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "У транзакции должно быть название")
+    @Size(max = 20, message = "Длина названия слишком большая")
     @Column(nullable = false)
     private String name;
 
     private String description;
 
+    @NotNull(message = "Тип транзакции должен быть указан")
     @Column(nullable = false)
     private boolean type;
 
+    @Min(value = 0, message = "Сумма транзакции не может быть меньше 0")
     @Column(nullable = false)
     private int amount;
 

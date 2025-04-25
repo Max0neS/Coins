@@ -1,6 +1,7 @@
 package com.example.coinwallet.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,9 +17,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "У пользователя должно быть имя")
+    @Size(max = 20, message = "Имя пользователя слишком большое")
     @Column(nullable = false)
     private String name;
 
+    @Email(message = "Email должен быть валидным")
+    @NotBlank(message = "Email не может быть пустым")
     @Column(nullable = false, unique = true)
     private String email;
 

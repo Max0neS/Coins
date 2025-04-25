@@ -7,6 +7,7 @@ import com.example.coinwallet.dto.TransactionWithUserAndCategoriesDTO;
 import com.example.coinwallet.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class TransactionController {
             description = "Позволяет создать транзакцию"
     )
     @PostMapping("/create")
-    public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionCreateDTO transactionDTO) {
+    public ResponseEntity<TransactionDTO> createTransaction(@Valid @RequestBody TransactionCreateDTO transactionDTO) {
         TransactionDTO createdTransaction = transactionService.createTransaction(transactionDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
     }
@@ -56,7 +57,7 @@ public class TransactionController {
     )
     @PutMapping("/update-by-id/{id}")
     public ResponseEntity<TransactionDTO> updateTransaction(
-            @PathVariable Long id,
+            @Valid @PathVariable Long id,
             @RequestBody TransactionCreateDTO transactionDTO) {
         return ResponseEntity.ok(transactionService.updateTransaction(id, transactionDTO));
     }

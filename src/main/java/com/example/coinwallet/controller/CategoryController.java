@@ -2,9 +2,12 @@
 
     import com.example.coinwallet.dto.CategoryDTO;
     import com.example.coinwallet.dto.CategoryWithTransactionsDTO;
+    import com.example.coinwallet.exception.BadRequestException;
+    import com.example.coinwallet.exception.ResourceNotFoundException;
     import com.example.coinwallet.model.Category;
     import com.example.coinwallet.service.CategoryService;
     import io.swagger.v3.oas.annotations.Operation;
+    import jakarta.validation.Valid;
     import lombok.AllArgsConstructor;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
@@ -20,12 +23,14 @@
     public class CategoryController {
         private final CategoryService categoryService;
 
+        @ExceptionHandler(BadRequestException.class)
         @Operation(
                 summary = "Создание категории",
                 description = "Позволяет создать общую категорию"
         )
         @PostMapping("/create")
-        public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
+        public ResponseEntity<CategoryDTO> createCategory(
+                @Valid @RequestBody Category category) {
             CategoryDTO createdCategory = categoryService.createCategory(category);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
         }
@@ -62,7 +67,7 @@
                 description = "Позволяет изменить имя категории"
         )
         @PutMapping("/update-by-id/{id}")
-        public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody Category category) {
+        public ResponseEntity<CategoryDTO> updateCategory(@Valid @PathVariable Long id, @RequestBody Category category) {
             return ResponseEntity.ok(categoryService.updateCategory(id, category));
         }
 

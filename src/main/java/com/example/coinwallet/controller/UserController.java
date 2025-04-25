@@ -6,6 +6,7 @@ import com.example.coinwallet.model.User;
 import com.example.coinwallet.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class UserController {
             description = "Позволяет создать нового пользователя"
     )
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody User user) {
         UserDTO savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
@@ -64,7 +65,7 @@ public class UserController {
             description = "Позволяет обновить информацию о пользователе"
     )
     @PutMapping("/update-by-id/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         return ResponseEntity.ok(userService.updateUser(id, user));
     }
 

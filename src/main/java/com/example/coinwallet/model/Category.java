@@ -1,6 +1,8 @@
 package com.example.coinwallet.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,6 +18,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "У категории должно быть название")
+    @Size(max = 20, message = "Длина названия слишком большая")
     @Column(nullable = false, unique = true)
     private String name;
 
